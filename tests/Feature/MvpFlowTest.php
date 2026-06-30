@@ -1,0 +1,71 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Chore;
+use App\Models\Reward;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class MvpFlowTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_parent_can_approve_a_chore_and_teen_can_redeem_a_voucher_reward(): void
+    {
+        $parent = User::factory()->create([
+            'role' => 'parent',
+            'points_balance' => 0,
+        ]);
+
+        $teen = User::factory()->create([
+            'role' => 'teen',
+            'points_balance' => 0,
+        ]);
+
+        $chore = Chore::factory()->create([
+            'title' => 'Clean room',
+            'points_value' => 15,
+            'created_by' => $parent->id,
+        ]);
+
+        $reward = Reward::factory()->create([
+            'name' => '1 hour internet',
+            'points_cost' => 15,
+            'duration_minutes' => 60,
+        ]);
+
+        $this->actingAs($teen)
+            ->post(route('chores.claim', $chore));
+
+        $this->assertDatabaseHas('chore_claims', [
+            'chore_id' => $chore->id,
+            'user_id' => $teen->id,
+            'status' => 'pending',
+        ]);
+
+        $claim = \App\Models\ChoreClaim::first();
+
+        $this->actingAs($parent)
+            ->post(route('claims.approve', $claim));
+
+        $teen->refresh();
+        $this->assertSame(15, $teen->points_balance);
+
+        $this->actingAs($teen)
+            ->post(route('rewards.redeem', $reward));
+
+        $this->assertDatabaseHas('reward_redemptions', [
+            'user_id' => $teen->id,
+            'reward_id' => $reward->id,
+            'status' => 'fulfilled',
+        ]);
+
+        $this->assertDatabaseHas('reward_redemptions', [
+            'user_id' => $teen->id,
+            'reward_id' => $reward->id,
+            'voucher_code' => 'TEST-1H-1',
+        ]);
+    }
+}
