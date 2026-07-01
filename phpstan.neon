@@ -1,0 +1,15 @@
+includes:
+  - ./vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+  level: 5
+  paths:
+    - app
+    - database
+    - routes
+    - tests
+  inferPrivatePropertyTypeFromConstructor: true
+  checkMissingIterableValueType: false
+  checkMissingVarTagType: false
+  checkExplicitMixed: false
+  checkGenericClassInNonGenericObjectType: false
