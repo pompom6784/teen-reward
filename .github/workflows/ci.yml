@@ -13,7 +13,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -23,7 +28,7 @@ jobs:
           extensions: mbstring, sqlite, pdo, pdo_sqlite, tokenizer, xml
 
       - name: Setup Composer cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.composer/cache
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
