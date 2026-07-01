@@ -29,6 +29,9 @@ Route::middleware('auth')->group(function () {
     // Parent-only chores management
     Route::resource('chores', App\Http\Controllers\ChoreController::class)->except(['show'])->names('chores');
 
+    // Reward redemption
+    Route::post('rewards/{reward}/redeem', [App\Http\Controllers\RewardController::class, 'redeem'])->name('rewards.redeem');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

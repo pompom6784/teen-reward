@@ -12,15 +12,15 @@
                     {{ __("You're logged in!") }}
                     @if(optional(auth()->user())->role === 'parent')
                         <div class="mt-4 space-y-2">
-                            <a href="{{ route('chores.index') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded">Manage chores</a>
-                            <a href="{{ route('claims.pending') }}" class="inline-block px-4 py-2 bg-yellow-600 text-white rounded">Pending claims</a>
+                            <a href="{{ route('chores.index') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded">{{ __('Manage chores') }}</a>
+                            <a href="{{ route('claims.pending') }}" class="inline-block px-4 py-2 bg-yellow-600 text-white rounded">{{ __('Pending claims') }}</a>
                         </div>
                     @endif
 
                     @if(optional(auth()->user())->role === 'teen')
                         <div class="mt-4 space-y-2">
-                            <a href="{{ route('chores.assigned') }}" class="inline-block px-4 py-2 bg-green-600 text-white rounded">My chores</a>
-                            <a href="{{ route('claims.index') }}" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded">My claims</a>
+                            <a href="{{ route('chores.assigned') }}" class="inline-block px-4 py-2 bg-green-600 text-white rounded">{{ __('My chores') }}</a>
+                            <a href="{{ route('claims.index') }}" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded">{{ __('My claims') }}</a>
                         </div>
                     @endif
                 </div>

@@ -1,21 +1,21 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Pending Claims</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Pending Claims') }}</h2>
     </x-slot>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 @if($claims->isEmpty())
-                    <div>No pending claims.</div>
+                    <div>{{ __('No pending claims.') }}</div>
                 @else
                     <table class="w-full text-left">
                         <thead>
                             <tr>
-                                <th class="pb-2">Chore</th>
-                                <th class="pb-2">Teen</th>
-                                <th class="pb-2">Submitted</th>
-                                <th class="pb-2">Actions</th>
+                                <th class="pb-2">{{ __('Chore') }}</th>
+                                <th class="pb-2">{{ __('Teen') }}</th>
+                                <th class="pb-2">{{ __('Submitted') }}</th>
+                                <th class="pb-2">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -27,12 +27,12 @@
                                     <td class="py-2">
                                         <form method="POST" action="{{ route('claims.approve', $claim) }}" style="display:inline">
                                             @csrf
-                                            <button class="px-3 py-1 bg-green-600 text-white rounded">Approve</button>
+                                            <button class="px-3 py-1 bg-green-600 text-white rounded">{{ __('Approve') }}</button>
                                         </form>
 
                                         <form method="POST" action="{{ route('claims.reject', $claim) }}" style="display:inline">
                                             @csrf
-                                            <button class="px-3 py-1 bg-red-600 text-white rounded">Reject</button>
+                                            <button class="px-3 py-1 bg-red-600 text-white rounded">{{ __('Reject') }}</button>
                                         </form>
                                     </td>
                                 </tr>

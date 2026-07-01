@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Available Chores</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Available Chores') }}</h2>
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -10,14 +10,14 @@
                 @endif
 
                 @if($chores->isEmpty())
-                    <div>No chores are available to claim right now.</div>
+                    <div>{{ __('No chores are available to claim right now.') }}</div>
                 @else
                     <table class="w-full text-left">
                         <thead>
                             <tr>
-                                <th class="pb-2">Title</th>
-                                <th class="pb-2">Points</th>
-                                <th class="pb-2">Actions</th>
+                                <th class="pb-2">{{ __('Title') }}</th>
+                                <th class="pb-2">{{ __('Points') }}</th>
+                                <th class="pb-2">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,7 +28,7 @@
                                     <td class="py-2">
                                         <form method="POST" action="{{ route('chores.claim', $chore) }}" style="display:inline">
                                             @csrf
-                                            <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">Claim</button>
+                                            <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">{{ __('Claim') }}</button>
                                         </form>
                                     </td>
                                 </tr>

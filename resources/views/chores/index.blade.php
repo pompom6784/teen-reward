@@ -1,8 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Chores</h2>
-            <a href="{{ route('chores.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded">New Chore</a>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Chores') }}</h2>
+            <a href="{{ route('chores.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded">{{ __('New Chore') }}</a>
         </div>
     </x-slot>
 
@@ -14,15 +14,15 @@
 
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 @if($chores->isEmpty())
-                    <div>No chores yet.</div>
+                    <div>{{ __('No chores yet.') }}</div>
                 @else
                     <table class="w-full text-left">
                         <thead>
                             <tr>
-                                <th class="pb-2">Title</th>
-                                <th class="pb-2">Points</th>
-                                <th class="pb-2">Recurrence</th>
-                                <th class="pb-2">Actions</th>
+                                <th class="pb-2">{{ __('Title') }}</th>
+                                <th class="pb-2">{{ __('Points') }}</th>
+                                <th class="pb-2">{{ __('Recurrence') }}</th>
+                                <th class="pb-2">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,12 +31,12 @@
                                     <td class="py-2">{{ $chore->title }}</td>
                                     <td class="py-2">{{ $chore->points_value }}</td>
                                 <td class="py-2">{{ ucfirst($chore->recurrence_type) }}@if($chore->recurrence_type === 'custom') (every {{ $chore->recurrence_interval }} {{ $chore->recurrence_unit }})@endif</td>
-                                        <a href="{{ route('chores.edit', $chore) }}" class="text-blue-600 mr-3">Edit</a>
+                                        <a href="{{ route('chores.edit', $chore) }}" class="text-blue-600 mr-3">{{ __('Edit') }}</a>
 
                                         <form action="{{ route('chores.destroy', $chore) }}" method="POST" style="display:inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600" onclick="return confirm('Delete this chore?')">Delete</button>
+                                            <button type="submit" class="text-red-600" onclick="return confirm('{{ __('Delete this chore?') }}')">{{ __('Delete') }}</button>
                                         </form>
                                     </td>
                                 </tr>

@@ -76,3 +76,5 @@ out/
 .yarn/install-state.gz
 .pnp.*
 vendor
+.phpunit.result.cache
+testing
