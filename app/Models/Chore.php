@@ -6,24 +6,42 @@ use App\Models\ChoreClaim;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property string|null $description
+ * @property int $points_value
+ * @property int $assigned_to
+ * @property int $created_by
+ * @property bool $active
+ * @property string $recurrence_type
+ * @property int|null $recurrence_interval
+ * @property string|null $recurrence_unit
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder|Chore where(string $column, $operator = null, $value = null, string $boolean = 'and')
+ * @method static \Illuminate\Database\Eloquent\Builder|Chore create(array $attributes = [])
+ */
 class Chore extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
-    public function creator()
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function completions()
+    public function completions(): HasMany
     {
         return $this->hasMany(ChoreCompletion::class);
     }
 
-    public function claims()
+    public function claims(): HasMany
     {
         return $this->hasMany(ChoreClaim::class);
     }

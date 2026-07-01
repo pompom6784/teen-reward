@@ -6,7 +6,8 @@ use App\Models\Chore;
 use App\Models\ChoreClaim;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\View\View;
 use Carbon\Carbon;
 
 class ClaimController extends Controller
@@ -19,11 +20,11 @@ class ClaimController extends Controller
     // Teen: list their claims
     public function index(): View
     {
-        if (auth()->user()->role !== 'teen') {
+        if (Auth::user()->role !== 'teen') {
             abort(403);
         }
 
-        $claims = ChoreClaim::where('user_id', auth()->id())->with('chore')->latest()->get();
+        $claims = ChoreClaim::where('user_id', Auth::id())->with('chore')->latest()->get();
 
         return view('claims.index', compact('claims'));
     }
@@ -31,7 +32,7 @@ class ClaimController extends Controller
     // Teen: claim a chore (one per period)
     public function store(Request $request, Chore $chore): RedirectResponse
     {
-        if (auth()->user()->role !== 'teen') {
+        if (Auth::user()->role !== 'teen') {
             abort(403);
         }
 
@@ -48,7 +49,7 @@ class ClaimController extends Controller
 
         ChoreClaim::create([
             'chore_id' => $chore->id,
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'period_start' => $periodStart->toDateString(),
             'status' => 'pending',
         ]);
@@ -59,7 +60,7 @@ class ClaimController extends Controller
     // Parent: list pending claims for household (simple: all pending)
     public function pending(): View
     {
-        if (auth()->user()->role !== 'parent') {
+        if (Auth::user()->role !== 'parent') {
             abort(403);
         }
 
@@ -70,7 +71,7 @@ class ClaimController extends Controller
 
     public function approve(ChoreClaim $claim): RedirectResponse
     {
-        if (auth()->user()->role !== 'parent') {
+        if (Auth::user()->role !== 'parent') {
             abort(403);
         }
 
@@ -84,7 +85,7 @@ class ClaimController extends Controller
 
     public function reject(ChoreClaim $claim): RedirectResponse
     {
-        if (auth()->user()->role !== 'parent') {
+        if (Auth::user()->role !== 'parent') {
             abort(403);
         }
 
@@ -106,10 +107,10 @@ class ClaimController extends Controller
 
     private function calculateCustomPeriodStart(Chore $chore, Carbon $now): Carbon
     {
-        $interval = $chore->recurrence_interval ?? 1;
+        $interval = (int) ($chore->recurrence_interval ?? 1);
         $unit = $chore->recurrence_unit ?: 'days';
         $anchor = Carbon::parse($chore->created_at)->startOfDay();
-        $diff = match ($unit) {
+        $diff = (int) match ($unit) {
             'days' => $anchor->diffInDays($now),
             'weeks' => $anchor->diffInWeeks($now),
             'months' => $anchor->diffInMonths($now),

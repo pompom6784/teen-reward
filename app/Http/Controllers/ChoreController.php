@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Chore;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
+use Illuminate\Contracts\View\View;
 
 class ChoreController extends Controller
 {
@@ -18,7 +19,7 @@ class ChoreController extends Controller
         // Only parents can manage chores (create/edit/delete)
         $this->middleware(function ($request, $next) {
             if (in_array($request->route()->getName(), ['chores.index', 'chores.create', 'chores.store', 'chores.edit', 'chores.update', 'chores.destroy'])) {
-                if (! auth()->user() || auth()->user()->role !== 'parent') {
+                if (! Auth::user() || Auth::user()->role !== 'parent') {
                     abort(403);
                 }
             }
@@ -32,7 +33,7 @@ class ChoreController extends Controller
      */
     public function index(): View
     {
-        $chores = Chore::where('created_by', auth()->id())->orderBy('id', 'desc')->get();
+        $chores = Chore::where('created_by', Auth::id())->orderBy('id', 'desc')->get();
 
         return view('chores.index', compact('chores'));
     }
@@ -64,7 +65,7 @@ class ChoreController extends Controller
             $data['recurrence_unit'] = null;
         }
 
-        $data['created_by'] = auth()->id();
+        $data['created_by'] = Auth::id();
 
         Chore::create($data);
 
