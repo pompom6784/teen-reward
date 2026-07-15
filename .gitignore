@@ -78,3 +78,4 @@ out/
 vendor
 .phpunit.result.cache
 testing
+public/build

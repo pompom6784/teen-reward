@@ -10,45 +10,58 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_can_be_rendered(): void
+    public function test_spa_shell_can_be_rendered(): void
     {
-        $response = $this->get('/login');
+        $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $response
+            ->assertOk()
+            ->assertSee('id="app"', false);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_users_can_authenticate_using_the_api(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->post('/login', [
+        $response = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'Logged in.');
+
+        $this->getJson('/api/bootstrap')
+            ->assertOk()
+            ->assertJsonPath('user.email', $user->email);
     }
 
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();
 
-        $this->post('/login', [
+        $response = $this->postJson('/api/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
 
         $this->assertGuest();
+        $response->assertStatus(422);
     }
 
     public function test_users_can_logout(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $response = $this->actingAs($user)->postJson('/api/logout');
 
-        $this->assertGuest();
-        $response->assertRedirect('/');
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'Logged out.');
+
+        $this->getJson('/api/bootstrap')
+            ->assertOk()
+            ->assertJsonPath('user', null);
     }
 }

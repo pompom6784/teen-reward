@@ -14,35 +14,36 @@ class ChoreManagementTest extends TestCase
     public function test_parent_can_create_edit_and_delete_chore(): void
     {
         $parent = User::factory()->create(['role' => 'parent']);
-        $teen = User::factory()->create(['role' => 'teen']);
 
         $this->actingAs($parent)
-            ->post(route('chores.store'), [
+            ->postJson('/api/chores', [
                 'title' => 'Test chore',
                 'description' => 'Do stuff',
                 'points_value' => 10,
                 'recurrence_type' => 'weekly',
+                'active' => true,
             ])
-            ->assertRedirect(route('chores.index'));
+            ->assertCreated();
 
         $this->assertDatabaseHas('chores', ['title' => 'Test chore', 'created_by' => $parent->id]);
 
         $chore = Chore::first();
 
         $this->actingAs($parent)
-            ->put(route('chores.update', $chore), [
+            ->putJson("/api/chores/{$chore->id}", [
                 'title' => 'Updated chore',
                 'description' => 'Updated',
                 'points_value' => 15,
                 'recurrence_type' => 'weekly',
+                'active' => true,
             ])
-            ->assertRedirect(route('chores.index'));
+            ->assertOk();
 
         $this->assertDatabaseHas('chores', ['title' => 'Updated chore', 'points_value' => 15]);
 
         $this->actingAs($parent)
-            ->delete(route('chores.destroy', $chore))
-            ->assertRedirect(route('chores.index'));
+            ->deleteJson("/api/chores/{$chore->id}")
+            ->assertOk();
 
         $this->assertDatabaseMissing('chores', ['id' => $chore->id]);
     }
@@ -52,11 +53,12 @@ class ChoreManagementTest extends TestCase
         $teen = User::factory()->create(['role' => 'teen']);
 
         $this->actingAs($teen)
-            ->get(route('chores.index'))
-            ->assertStatus(403);
-
-        $this->actingAs($teen)
-            ->post(route('chores.store'), [])
+            ->postJson('/api/chores', [
+                'title' => 'Nope',
+                'points_value' => 5,
+                'recurrence_type' => 'weekly',
+                'active' => true,
+            ])
             ->assertStatus(403);
     }
 }

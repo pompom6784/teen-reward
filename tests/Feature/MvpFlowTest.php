@@ -37,7 +37,8 @@ class MvpFlowTest extends TestCase
         ]);
 
         $this->actingAs($teen)
-            ->post(route('chores.claim', $chore));
+            ->postJson("/api/chores/{$chore->id}/claim")
+            ->assertCreated();
 
         $this->assertDatabaseHas('chore_claims', [
             'chore_id' => $chore->id,
@@ -48,13 +49,15 @@ class MvpFlowTest extends TestCase
         $claim = \App\Models\ChoreClaim::first();
 
         $this->actingAs($parent)
-            ->post(route('claims.approve', $claim));
+            ->postJson("/api/claims/{$claim->id}/approve")
+            ->assertOk();
 
         $teen->refresh();
         $this->assertSame(15, $teen->points_balance);
 
         $this->actingAs($teen)
-            ->post(route('rewards.redeem', $reward));
+            ->postJson("/api/rewards/{$reward->id}/redeem")
+            ->assertCreated();
 
         $this->assertDatabaseHas('reward_redemptions', [
             'user_id' => $teen->id,
@@ -65,7 +68,7 @@ class MvpFlowTest extends TestCase
         $this->assertDatabaseHas('reward_redemptions', [
             'user_id' => $teen->id,
             'reward_id' => $reward->id,
-            'voucher_code' => 'TEST-1H-1',
+            'voucher_code' => 'VOUCHER-1-1',
         ]);
     }
 }

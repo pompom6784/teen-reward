@@ -16,9 +16,11 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get('/profile');
+            ->getJson('/api/bootstrap');
 
-        $response->assertOk();
+        $response
+            ->assertOk()
+            ->assertJsonPath('user.email', $user->email);
     }
 
     public function test_profile_information_can_be_updated(): void
@@ -27,14 +29,14 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->patch('/profile', [
+            ->patchJson('/api/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
 
         $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+            ->assertOk()
+            ->assertJsonPath('message', 'Profile updated.');
 
         $user->refresh();
 
@@ -49,14 +51,14 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->patch('/profile', [
+            ->patchJson('/api/profile', [
                 'name' => 'Test User',
                 'email' => $user->email,
             ]);
 
         $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/profile');
+            ->assertOk()
+            ->assertJsonPath('message', 'Profile updated.');
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
@@ -67,13 +69,13 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->delete('/profile', [
+            ->deleteJson('/api/profile', [
                 'password' => 'password',
             ]);
 
         $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect('/');
+            ->assertOk()
+            ->assertJsonPath('message', 'Account deleted.');
 
         $this->assertGuest();
         $this->assertNull($user->fresh());
@@ -85,14 +87,11 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->from('/profile')
-            ->delete('/profile', [
+            ->deleteJson('/api/profile', [
                 'password' => 'wrong-password',
             ]);
 
-        $response
-            ->assertSessionHasErrorsIn('userDeletion', 'password')
-            ->assertRedirect('/profile');
+        $response->assertStatus(422);
 
         $this->assertNotNull($user->fresh());
     }
