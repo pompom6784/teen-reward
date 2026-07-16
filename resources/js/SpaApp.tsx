@@ -1,33 +1,47 @@
-import { useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion';
-import Navbar, { Tab } from './components/Navbar'
-import Dashboard from './pages/Dashboard'
-import Tasks from './pages/Tasks'
-import Shop from './pages/Shop'
-
+import LoadingPage from './components/LoadingPage';
+import { useSpaAppState } from './hooks/useSpaAppState';
+import AuthenticatedApp from './pages/AuthenticatedApp';
+import Login from './pages/Login';
 
 export default function App() {
-  const [page, setPage] = useState<Tab['id']>('home')
-  const [coins, setCoins] = useState<number>(245)
-  const [level, setLevel] = useState<number>(3)
+    const app = useSpaAppState();
 
-  return (
-    <div className="app-container">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={page}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.3 }}
-          className="page"
-        >
-          {page === 'home' && <Dashboard coins={coins} level={level} />}
-          {page === 'tasks' && <Tasks setCoins={setCoins} setLevel={setLevel} coins={coins} level={level} />}
-          {page === 'shop' && <Shop coins={coins} setCoins={setCoins} />}
-        </motion.div>
-      </AnimatePresence>
-      <Navbar setPage={setPage} activePage={page} />
-    </div>
-  )
+    return (
+        <div className="app-container">
+            {app.loading ? (
+                <LoadingPage />
+            ) : app.user ? (
+                <AuthenticatedApp
+                    page={app.page}
+                    setPage={app.setPage}
+                    notice={app.notice}
+                    panelError={app.panelError}
+                    busyKey={app.busyKey}
+                    payload={app.payload}
+                    user={app.user}
+                    coins={app.coins}
+                    level={app.level}
+                    isTeen={app.isTeen}
+                    isParent={app.isParent}
+                    onLogout={app.logout}
+                    onClaim={app.claimChore}
+                    onCreateChore={app.createChore}
+                    onUpdateChore={app.updateChore}
+                    onDeleteChore={app.deleteChore}
+                    onRedeemReward={app.redeemReward}
+                    onCreateReward={app.createReward}
+                    onUpdateReward={app.updateReward}
+                    onDeleteReward={app.deleteReward}
+                />
+            ) : (
+                <Login
+                    authForm={app.authForm}
+                    busy={app.busyKey === 'login'}
+                    error={app.panelError}
+                    onChange={app.updateAuthForm}
+                    onSubmit={app.login}
+                />
+            )}
+        </div>
+    );
 }

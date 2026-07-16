@@ -20,12 +20,13 @@ class ChoreManagementTest extends TestCase
                 'title' => 'Test chore',
                 'description' => 'Do stuff',
                 'points_value' => 10,
+                'emoji' => '🧺',
                 'recurrence_type' => 'weekly',
                 'active' => true,
             ])
             ->assertCreated();
 
-        $this->assertDatabaseHas('chores', ['title' => 'Test chore', 'created_by' => $parent->id]);
+        $this->assertDatabaseHas('chores', ['title' => 'Test chore', 'emoji' => '🧺', 'created_by' => $parent->id]);
 
         $chore = Chore::first();
 
@@ -34,12 +35,13 @@ class ChoreManagementTest extends TestCase
                 'title' => 'Updated chore',
                 'description' => 'Updated',
                 'points_value' => 15,
+                'emoji' => '🚿',
                 'recurrence_type' => 'weekly',
                 'active' => true,
             ])
             ->assertOk();
 
-        $this->assertDatabaseHas('chores', ['title' => 'Updated chore', 'points_value' => 15]);
+        $this->assertDatabaseHas('chores', ['title' => 'Updated chore', 'points_value' => 15, 'emoji' => '🚿']);
 
         $this->actingAs($parent)
             ->deleteJson("/api/chores/{$chore->id}")

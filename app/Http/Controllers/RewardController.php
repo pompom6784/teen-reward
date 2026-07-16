@@ -13,7 +13,7 @@ class RewardController extends Controller
         $user = auth()->user();
 
         if ($user->points_balance < $reward->points_cost) {
-            return redirect()->back()->with('error', 'You do not have enough points.');
+            return redirect()->back()->with('error', __('messages.reward.not_enough_points'));
         }
 
         $user->decrement('points_balance', $reward->points_cost);
@@ -26,6 +26,6 @@ class RewardController extends Controller
             'redeemed_at' => now(),
         ]);
 
-        return redirect()->back()->with('status', 'Reward redeemed. Voucher: TEST-1H-1');
+        return redirect()->back()->with('status', __('messages.reward.redeemed_with_voucher', ['voucher' => 'TEST-1H-1']));
     }
 }

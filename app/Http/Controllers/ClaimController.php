@@ -44,7 +44,7 @@ class ClaimController extends Controller
             ->first();
 
         if ($existing) {
-            return redirect()->back()->with('status', 'You already claimed this chore for the current period.');
+            return redirect()->back()->with('status', __('messages.claim.already_claimed_current_period'));
         }
 
         ChoreClaim::create([
@@ -54,7 +54,7 @@ class ClaimController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->back()->with('status', 'Claim submitted for approval.');
+        return redirect()->back()->with('status', __('messages.claim.submitted_for_approval'));
     }
 
     // Parent: list pending claims for household (simple: all pending)
@@ -80,7 +80,7 @@ class ClaimController extends Controller
         $claim->user->increment('points_balance', $points);
         $claim->update(['status' => 'approved', 'points_awarded' => $points]);
 
-        return redirect()->back()->with('status', 'Claim approved.');
+        return redirect()->back()->with('status', __('messages.claim.approved'));
     }
 
     public function reject(ChoreClaim $claim): RedirectResponse
@@ -91,7 +91,7 @@ class ClaimController extends Controller
 
         $claim->update(['status' => 'rejected']);
 
-        return redirect()->back()->with('status', 'Claim rejected.');
+        return redirect()->back()->with('status', __('messages.claim.rejected'));
     }
 
     private function calculatePeriodStart(Chore $chore, Carbon $now): Carbon

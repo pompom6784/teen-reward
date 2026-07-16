@@ -6,9 +6,43 @@ use App\Http\Controllers\Controller;
 use App\Models\Reward;
 use App\Models\RewardRedemption;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class RewardController extends Controller
 {
+    public function store(Request $request): JsonResponse
+    {
+        abort_unless($request->user()?->role === 'parent', 403);
+
+        Reward::query()->create($this->validateReward($request));
+
+        return response()->json([
+            'message' => __('messages.reward.created'),
+        ], 201);
+    }
+
+    public function update(Request $request, Reward $reward): JsonResponse
+    {
+        abort_unless($request->user()?->role === 'parent', 403);
+
+        $reward->update($this->validateReward($request));
+
+        return response()->json([
+            'message' => __('messages.reward.updated'),
+        ]);
+    }
+
+    public function destroy(Request $request, Reward $reward): JsonResponse
+    {
+        abort_unless($request->user()?->role === 'parent', 403);
+
+        $reward->delete();
+
+        return response()->json([
+            'message' => __('messages.reward.deleted'),
+        ]);
+    }
+
     public function redeem(Reward $reward): JsonResponse
     {
         $user = auth()->user();
@@ -17,7 +51,7 @@ class RewardController extends Controller
 
         if ($user->points_balance < $reward->points_cost) {
             return response()->json([
-                'message' => 'You do not have enough points.',
+                'message' => __('messages.reward.not_enough_points'),
             ], 422);
         }
 
@@ -36,8 +70,25 @@ class RewardController extends Controller
         ]);
 
         return response()->json([
-            'message' => "Reward redeemed. Voucher: {$voucherCode}",
+            'message' => __('messages.reward.redeemed_with_voucher', ['voucher' => $voucherCode]),
             'voucherCode' => $voucherCode,
         ], 201);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validateReward(Request $request): array
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'points_cost' => ['required', 'integer', 'min:0'],
+            'duration_minutes' => ['required', 'integer', 'min:1'],
+            'emoji' => ['nullable', 'string', 'max:16'],
+        ]);
+
+        $data['emoji'] = filled($data['emoji'] ?? null) ? $data['emoji'] : '🎁';
+
+        return $data;
     }
 }

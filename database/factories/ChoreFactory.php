@@ -19,6 +19,7 @@ class ChoreFactory extends Factory
             'title' => fake()->sentence(3),
             'description' => fake()->optional()->sentence(),
             'points_value' => 10,
+            'emoji' => '🧹',
             'recurrence_type' => 'weekly',
             'recurrence_interval' => null,
             'created_by' => User::factory()->state(['role' => 'parent']),

@@ -18,6 +18,7 @@ class RewardFactory extends Factory
             'name' => fake()->word(),
             'points_cost' => 15,
             'duration_minutes' => 60,
+            'emoji' => '🎁',
         ];
     }
 }

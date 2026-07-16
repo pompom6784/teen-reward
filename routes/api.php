@@ -29,5 +29,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/claims/{claim}/approve', [ClaimController::class, 'approve'])->name('api.claims.approve');
     Route::post('/claims/{claim}/reject', [ClaimController::class, 'reject'])->name('api.claims.reject');
 
+    Route::post('/rewards', [RewardController::class, 'store'])->name('api.rewards.store');
+    Route::put('/rewards/{reward}', [RewardController::class, 'update'])->name('api.rewards.update');
+    Route::delete('/rewards/{reward}', [RewardController::class, 'destroy'])->name('api.rewards.destroy');
     Route::post('/rewards/{reward}/redeem', [RewardController::class, 'redeem'])->name('api.rewards.redeem');
 });

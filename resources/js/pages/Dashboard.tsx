@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import type { DashboardProps } from '../type'
 
 const levelNames = [
   'Novice du balai',      // 1
@@ -9,11 +10,21 @@ const levelNames = [
   'Légende Ordure',       // 6
 ]
 
-const nextLevelAt = 500
-
-export default function Dashboard({ coins, level }: { coins: number, level: number }) {
-  const pct = Math.min((coins / nextLevelAt) * 100, 100)
+export default function Dashboard({
+  coins,
+  level,
+  userName,
+  role,
+  pendingClaims,
+  availableChores,
+}: DashboardProps) {
+  const previousLevelAt = thresholdForLevel(level - 1)
+  const nextLevelAt = thresholdForLevel(level)
+  const pct = level >= 6
+    ? 100
+    : Math.min(((coins - previousLevelAt) / Math.max(nextLevelAt - previousLevelAt, 1)) * 100, 100)
   const name = levelNames[level - 1] || 'Novice'
+  const remaining = Math.max(nextLevelAt - coins, 0)
 
   return (
     <div className="dashboard">
@@ -30,7 +41,7 @@ export default function Dashboard({ coins, level }: { coins: number, level: numb
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.1 }}
       >
-        Alex
+        {userName}
       </motion.h1>
 
       <motion.div
@@ -39,7 +50,7 @@ export default function Dashboard({ coins, level }: { coins: number, level: numb
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <p className="balance-label">Solde actuel</p>
+        <p className="balance-label">Points actuels</p>
         <motion.div
           className="balance-amount"
           key={coins}
@@ -59,9 +70,11 @@ export default function Dashboard({ coins, level }: { coins: number, level: numb
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35 }}
       >
-        <p style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>
-          Prochain niveau dans {nextLevelAt - coins} coins
-        </p>
+        {level < 6 ? (
+          <p style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>
+            Prochain niveau dans {remaining} coins
+          </p>
+        ) : null}
         <div className="level-progress">
           <motion.div
             className="level-progress-fill"
@@ -70,7 +83,9 @@ export default function Dashboard({ coins, level }: { coins: number, level: numb
             transition={{ duration: 1.2, ease: 'easeOut' }}
           />
         </div>
-        <p className="progress-text">{Math.round(pct)}% vers le niveau {level + 1}</p>
+        <p className="progress-text">
+          {level < 6 ? `${Math.round(pct)}% vers le niveau ${level + 1}` : 'Niveau maximum atteint 🎉'}
+        </p>
       </motion.div>
 
       <motion.div
@@ -79,8 +94,38 @@ export default function Dashboard({ coins, level }: { coins: number, level: numb
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5 }}
       >
-        🎁 Défi du jour : fais 2 tâches → +10 coins bonus !
+        {role === 'teen'
+          ? `🎁 Missions disponibles : ${availableChores}`
+          : `🧾 Demandes en attente : ${pendingClaims}`}
       </motion.div>
     </div>
   )
+}
+
+function thresholdForLevel(level: number) {
+  if (level <= 0) {
+    return 0
+  }
+
+  if (level === 1) {
+    return 100
+  }
+
+  if (level === 2) {
+    return 250
+  }
+
+  if (level === 3) {
+    return 500
+  }
+
+  if (level === 4) {
+    return 900
+  }
+
+  if (level === 5) {
+    return 1400
+  }
+
+  return 2000
 }

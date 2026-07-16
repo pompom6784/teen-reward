@@ -30,7 +30,7 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertJsonPath('message', 'Logged in.');
+            ->assertJsonPath('message', __('messages.auth.logged_in'));
 
         $this->getJson('/api/bootstrap')
             ->assertOk()
@@ -58,7 +58,7 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertJsonPath('message', 'Logged out.');
+            ->assertJsonPath('message', __('messages.auth.logged_out'));
 
         $this->getJson('/api/bootstrap')
             ->assertOk()

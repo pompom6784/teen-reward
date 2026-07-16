@@ -40,7 +40,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
-            'message' => 'Account created.',
+            'message' => __('messages.auth.account_created'),
             'csrfToken' => csrf_token(),
         ], 201);
     }
@@ -55,7 +55,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
-            'message' => 'Logged in.',
+            'message' => __('messages.auth.logged_in'),
             'csrfToken' => csrf_token(),
         ]);
     }
@@ -70,7 +70,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
-            'message' => 'Logged out.',
+            'message' => __('messages.auth.logged_out'),
             'csrfToken' => csrf_token(),
         ]);
     }

@@ -69,7 +69,7 @@ class ChoreController extends Controller
 
         Chore::create($data);
 
-        return redirect()->route('chores.index')->with('status', 'Chore created.');
+        return redirect()->route('chores.index')->with('status', __('messages.chore.created'));
     }
 
     /**
@@ -105,7 +105,7 @@ class ChoreController extends Controller
 
         $chore->update($data);
 
-        return redirect()->route('chores.index')->with('status', 'Chore updated.');
+        return redirect()->route('chores.index')->with('status', __('messages.chore.updated'));
     }
 
     /**
@@ -117,7 +117,7 @@ class ChoreController extends Controller
 
         $chore->delete();
 
-        return redirect()->route('chores.index')->with('status', 'Chore deleted.');
+        return redirect()->route('chores.index')->with('status', __('messages.chore.deleted'));
     }
 
     /**

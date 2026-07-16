@@ -20,7 +20,7 @@ class ChoreController extends Controller
         Chore::query()->create($data);
 
         return response()->json([
-            'message' => 'Chore created.',
+            'message' => __('messages.chore.created'),
         ], 201);
     }
 
@@ -32,7 +32,7 @@ class ChoreController extends Controller
         $chore->update($this->validateChore($request));
 
         return response()->json([
-            'message' => 'Chore updated.',
+            'message' => __('messages.chore.updated'),
         ]);
     }
 
@@ -44,7 +44,7 @@ class ChoreController extends Controller
         $chore->delete();
 
         return response()->json([
-            'message' => 'Chore deleted.',
+            'message' => __('messages.chore.deleted'),
         ]);
     }
 
@@ -57,6 +57,7 @@ class ChoreController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'points_value' => ['required', 'integer', 'min:0'],
+            'emoji' => ['nullable', 'string', 'max:16'],
             'recurrence_type' => ['required', Rule::in(['none', 'daily', 'weekly', 'monthly', 'custom'])],
             'recurrence_interval' => ['nullable', 'integer', 'min:1', 'required_if:recurrence_type,custom'],
             'recurrence_unit' => ['nullable', Rule::in(['days', 'weeks', 'months']), 'required_if:recurrence_type,custom'],
@@ -69,6 +70,7 @@ class ChoreController extends Controller
         }
 
         $data['active'] ??= true;
+        $data['emoji'] = filled($data['emoji'] ?? null) ? $data['emoji'] : '🧹';
 
         return $data;
     }

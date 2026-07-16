@@ -25,7 +25,7 @@ class PasswordUpdateTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertJsonPath('message', 'Password updated.');
+            ->assertJsonPath('message', __('messages.profile.password_updated'));
 
         $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
     }

@@ -36,7 +36,7 @@ class ProfileTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertJsonPath('message', 'Profile updated.');
+            ->assertJsonPath('message', __('messages.profile.updated'));
 
         $user->refresh();
 
@@ -58,7 +58,7 @@ class ProfileTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertJsonPath('message', 'Profile updated.');
+            ->assertJsonPath('message', __('messages.profile.updated'));
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
@@ -75,7 +75,7 @@ class ProfileTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertJsonPath('message', 'Account deleted.');
+            ->assertJsonPath('message', __('messages.profile.account_deleted'));
 
         $this->assertGuest();
         $this->assertNull($user->fresh());

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
+import type { AppPage } from '../type'
 
-export type Tab = { id: 'home' | 'tasks' | 'shop', emoji: string, label: string }
+export type Tab = { id: AppPage, emoji: string, label: string }
 
 const tabs: Tab[] = [
   { id: 'home', emoji: '🏠', label: 'Accueil' },
@@ -8,7 +9,7 @@ const tabs: Tab[] = [
   { id: 'shop', emoji: '🛍', label: 'Boutique' },
 ]
 
-export default function Navbar({ setPage, activePage }: { setPage: (page: Tab['id']) => void, activePage: string }) {
+export default function Navbar({ setPage, activePage }: { setPage: (page: Tab['id']) => void, activePage: AppPage }) {
   return (
     <nav className="navbar">
       {tabs.map((tab) => (

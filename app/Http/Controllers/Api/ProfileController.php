@@ -23,7 +23,7 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return response()->json([
-            'message' => 'Profile updated.',
+            'message' => __('messages.profile.updated'),
         ]);
     }
 
@@ -39,7 +39,7 @@ class ProfileController extends Controller
         ])->save();
 
         return response()->json([
-            'message' => 'Password updated.',
+            'message' => __('messages.profile.password_updated'),
         ]);
     }
 
@@ -58,7 +58,7 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
-            'message' => 'Account deleted.',
+            'message' => __('messages.profile.account_deleted'),
             'csrfToken' => csrf_token(),
         ]);
     }

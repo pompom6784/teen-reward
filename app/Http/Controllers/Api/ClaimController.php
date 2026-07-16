@@ -25,7 +25,7 @@ class ClaimController extends Controller
 
         if ($existing) {
             return response()->json([
-                'message' => 'You already claimed this chore for the current period.',
+                'message' => __('messages.claim.already_claimed_current_period'),
             ], 422);
         }
 
@@ -37,7 +37,7 @@ class ClaimController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Claim submitted for approval.',
+            'message' => __('messages.claim.submitted_for_approval'),
         ], 201);
     }
 
@@ -47,7 +47,7 @@ class ClaimController extends Controller
 
         if ($claim->status !== 'pending') {
             return response()->json([
-                'message' => 'Only pending claims can be approved.',
+                'message' => __('messages.claim.only_pending_can_be_approved'),
             ], 422);
         }
 
@@ -61,7 +61,7 @@ class ClaimController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Claim approved.',
+            'message' => __('messages.claim.approved'),
         ]);
     }
 
@@ -71,7 +71,7 @@ class ClaimController extends Controller
 
         if ($claim->status !== 'pending') {
             return response()->json([
-                'message' => 'Only pending claims can be rejected.',
+                'message' => __('messages.claim.only_pending_can_be_rejected'),
             ], 422);
         }
 
@@ -80,7 +80,7 @@ class ClaimController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Claim rejected.',
+            'message' => __('messages.claim.rejected'),
         ]);
     }
 

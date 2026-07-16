@@ -70,6 +70,7 @@ class AppBootstrapController extends Controller
                 'title' => $chore->title,
                 'description' => $chore->description,
                 'pointsValue' => $chore->points_value,
+                'emoji' => $chore->emoji,
                 'recurrenceType' => $chore->recurrence_type,
                 'recurrenceInterval' => $chore->recurrence_interval,
                 'recurrenceUnit' => $chore->recurrence_unit,
@@ -87,6 +88,7 @@ class AppBootstrapController extends Controller
                         'id' => $claim->chore->id,
                         'title' => $claim->chore->title,
                         'pointsValue' => $claim->chore->points_value,
+                        'emoji' => $claim->chore->emoji,
                     ]
                     : null,
                 'user' => $claim->relationLoaded('user') && $claim->user
@@ -104,6 +106,7 @@ class AppBootstrapController extends Controller
                     'name' => $reward->name,
                     'pointsCost' => $reward->points_cost,
                     'durationMinutes' => $reward->duration_minutes,
+                    'emoji' => $reward->emoji,
                 ])
                 ->values(),
             'redemptions' => $redemptions->map(fn (RewardRedemption $redemption) => [

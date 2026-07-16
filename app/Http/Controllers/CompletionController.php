@@ -12,6 +12,6 @@ class CompletionController extends Controller
         $completion->update(['status' => 'approved']);
         $completion->user->increment('points_balance', $completion->chore->points_value);
 
-        return redirect()->back()->with('status', 'Chore approved and points added.');
+        return redirect()->back()->with('status', __('messages.completion.approved_points_added'));
     }
 }

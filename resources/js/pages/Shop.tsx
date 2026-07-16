@@ -1,68 +1,222 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import type { PurchasedReward, Reward, RewardDraft, ShopProps } from '../type';
 
-const REWARDS = [
-  { id: 1, name: '30 min d\'écran',    emoji: '📱', cost: 50  },
-  { id: 2, name: 'Un dessert',        emoji: '🍰', cost: 75  },
-  { id: 3, name: 'Sortie au parc',    emoji: '🎢', cost: 100 },
-  { id: 4, name: 'Film + popcorn',    emoji: '🎬', cost: 150 },
-  { id: 5, name: 'Sleep-in 30min',    emoji: '😴', cost: 80  },
-  { id: 6, name: 'Choix du dîner',    emoji: '🍕', cost: 60  },
-  { id: 7, name: 'Jour sans chores', emoji: '🏖️', cost: 200 },
-  { id: 8, name: 'Bon pour 10€',     emoji: '💶', cost: 300 },
-]
+export default function Shop({
+  rewards,
+  coins,
+  canRedeem,
+  canManage,
+  busyKey,
+  onRedeem,
+  onCreate,
+  onUpdate,
+  onDelete,
+}: ShopProps) {
+  const [purchased, setPurchased] = useState<PurchasedReward | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState<RewardDraft>({
+    name: '',
+    pointsCost: 50,
+    durationMinutes: 60,
+    emoji: '🎁',
+  });
 
-type Reward = { id: number, name: string, emoji: string, cost: number };
-
-export default function Shop({ coins, setCoins }: { coins: number, setCoins: (c: number) => void }) {
-  const [purchased, setPurchased] = useState<Reward | null>(null)
-
-  const buy = (reward: Reward) => {
-    if (coins < reward.cost) {
+  async function buy(reward: Reward) {
+    if (coins < reward.pointsCost || !canRedeem) {
       return;
     }
-    setCoins(coins - reward.cost)
-    setPurchased(reward)
-    setTimeout(() => setPurchased(null), 2500)
+
+    const result = await onRedeem(reward.id);
+
+    if (!result.ok) {
+      return;
+    }
+
+    setPurchased({
+      name: reward.name,
+      emoji: reward.emoji || emojiForReward(reward.name),
+      voucherCode: result.voucherCode,
+    });
+    setTimeout(() => setPurchased(null), 3000);
+  }
+
+  function startEdit(reward: Reward) {
+    setEditingId(reward.id);
+    setForm({
+      name: reward.name,
+      pointsCost: reward.pointsCost,
+      durationMinutes: reward.durationMinutes,
+      emoji: reward.emoji,
+    });
+  }
+
+  function resetForm() {
+    setEditingId(null);
+    setForm({
+      name: '',
+      pointsCost: 50,
+      durationMinutes: 60,
+      emoji: '🎁',
+    });
+  }
+
+  async function submitParentForm(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const payload: RewardDraft = {
+      name: form.name.trim(),
+      pointsCost: form.pointsCost,
+      durationMinutes: form.durationMinutes,
+      emoji: form.emoji.trim(),
+    };
+
+    const success = editingId
+      ? await onUpdate(editingId, payload)
+      : await onCreate(payload);
+
+    if (success) {
+      resetForm();
+    }
+  }
+
+  async function removeReward(rewardId: number) {
+    const success = await onDelete(rewardId);
+
+    if (success && editingId === rewardId) {
+      resetForm();
+    }
   }
 
   return (
     <div className="shop-page">
       <div className="shop-header">
         <h2>🛍 Boutique</h2>
-        <div className="shop-coins">💰 {coins} ChoreCoins</div>
+        <div className="shop-coins">
+          {canManage ? 'Gestion des récompenses' : `💰 ${coins} ChoreCoins`}
+        </div>
       </div>
 
+      {canManage ? (
+        <form className="crud-panel" onSubmit={submitParentForm}>
+          <div className="crud-row">
+            <input
+              className="crud-input crud-emoji-input"
+              placeholder="🎁"
+              maxLength={16}
+              value={form.emoji}
+              onChange={(event) => setForm((current) => ({ ...current, emoji: event.target.value }))}
+              required
+            />
+            <input
+              className="crud-input"
+              placeholder="Nom de la récompense"
+              value={form.name}
+              onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+              required
+            />
+            <input
+              className="crud-input"
+              type="number"
+              min={0}
+              placeholder="Coût points"
+              value={form.pointsCost}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, pointsCost: Number(event.target.value) || 0 }))
+              }
+              required
+            />
+          </div>
+          <div className="crud-row">
+            <input
+              className="crud-input"
+              type="number"
+              min={1}
+              placeholder="Durée (minutes)"
+              value={form.durationMinutes}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, durationMinutes: Number(event.target.value) || 1 }))
+              }
+              required
+            />
+          </div>
+          <div className="crud-actions">
+            <button
+              type="submit"
+              className="crud-submit-btn"
+              disabled={busyKey === 'reward:create' || (editingId !== null && busyKey === `reward:update:${editingId}`)}
+            >
+              {editingId ? 'Mettre à jour' : 'Ajouter récompense'}
+            </button>
+            {editingId ? (
+              <button type="button" className="crud-cancel-btn" onClick={resetForm}>
+                Annuler
+              </button>
+            ) : null}
+          </div>
+        </form>
+      ) : null}
+
       <div className="shop-grid">
-        {REWARDS.map((r, i) => {
-          const can = coins >= r.cost
+        {rewards.map((reward, i) => {
+          const isRedeemBusy = busyKey === `redeem:${reward.id}`;
+          const canTeenRedeem = canRedeem && coins >= reward.pointsCost && !isRedeemBusy;
+          const isDeleteBusy = busyKey === `reward:delete:${reward.id}`;
+
           return (
             <motion.div
-              key={r.id}
-              className={`reward-card ${can ? 'affordable' : ''}`}
+              key={reward.id}
+              className={`reward-card ${canTeenRedeem || canManage ? 'affordable' : ''}`}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: i * 0.07 }}
-              whileHover={can ? { scale: 1.05 } : {}}
-              whileTap={can ? { scale: 0.95 } : {}}
+              whileHover={canTeenRedeem || canManage ? { scale: 1.05 } : {}}
+              whileTap={canTeenRedeem ? { scale: 0.95 } : {}}
             >
-              <div className="reward-emoji">{r.emoji}</div>
-              <div className="reward-name">{r.name}</div>
-              <div className={`reward-cost ${can ? '' : 'cant'}`}>
-                💰 {r.cost}
-              </div>
-              <motion.button
-                className="reward-btn"
-                disabled={!can}
-                onClick={() => buy(r)}
-                whileTap={can ? { scale: 0.9 } : {}}
-              >
-                {can ? 'échanger' : 'pas assez'}
-              </motion.button>
+              <div className="reward-emoji">{reward.emoji || emojiForReward(reward.name)}</div>
+              <div className="reward-name">{reward.name}</div>
+              <div className="reward-cost">💰 {reward.pointsCost}</div>
+              <p className="reward-duration">{reward.durationMinutes} min</p>
+
+              {canManage ? (
+                <div className="reward-admin-actions">
+                  <button
+                    type="button"
+                    className="task-admin-btn"
+                    onClick={() => startEdit(reward)}
+                    disabled={isDeleteBusy}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    type="button"
+                    className="task-admin-btn danger"
+                    onClick={() => void removeReward(reward.id)}
+                    disabled={isDeleteBusy}
+                  >
+                    {isDeleteBusy ? '…' : '🗑'}
+                  </button>
+                </div>
+              ) : (
+                <motion.button
+                  className="reward-btn"
+                  disabled={!canTeenRedeem}
+                  onClick={() => void buy(reward)}
+                  whileTap={canTeenRedeem ? { scale: 0.9 } : {}}
+                >
+                  {isRedeemBusy
+                    ? '…'
+                    : canRedeem
+                      ? (coins >= reward.pointsCost ? 'échanger' : 'pas assez')
+                      : 'réservé ado'}
+                </motion.button>
+              )}
             </motion.div>
-          )
+          );
         })}
       </div>
+
+      {!canRedeem && !canManage ? <p className="role-tip">Accès non disponible.</p> : null}
 
       <AnimatePresence>
         {purchased && (
@@ -90,10 +244,25 @@ export default function Shop({ coins, setCoins }: { coins: number, setCoins: (c:
               <p style={{ color: '#666', marginTop: 4 }}>Tu as obtenu :</p>
               <div style={{ fontSize: 36, margin: '12px 0' }}>{purchased.emoji}</div>
               <div style={{ fontWeight: 800, fontSize: 20 }}>{purchased.name}</div>
+              <p className="voucher-code">Code: {purchased.voucherCode}</p>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
-  )
+  );
+}
+
+function emojiForReward(name: string) {
+  const value = name.toLowerCase();
+
+  if (value.includes('écran') || value.includes('screen')) return '📱';
+  if (value.includes('dessert')) return '🍰';
+  if (value.includes('parc')) return '🎢';
+  if (value.includes('film') || value.includes('popcorn')) return '🎬';
+  if (value.includes('dîner') || value.includes('pizza')) return '🍕';
+  if (value.includes('voucher') || value.includes('bon')) return '🎟️';
+  if (value.includes('sleep')) return '😴';
+
+  return '🎁';
 }
