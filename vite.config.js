@@ -6,7 +6,7 @@ export default defineConfig({
     plugins: [
         react(),
         laravel({
-            input: ['resources/css/styles.css', 'resources/js/App.jsx'],
+            input: ['resources/css/styles.css', 'resources/js/App.tsx'],
             refresh: true,
         }),
     ],

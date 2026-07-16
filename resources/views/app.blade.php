@@ -10,7 +10,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600;700;800&display=swap" rel="stylesheet" />
 
-        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+        @vite(['resources/css/styles.css', 'resources/js/App.tsx'])
     </head>
     <body class="bg-slate-950 font-sans text-slate-100 antialiased">
         <div id="app"></div>
